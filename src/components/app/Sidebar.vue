@@ -22,7 +22,7 @@ export default {
   data: () => ({
     links: [
       {
-        title: "Счет",
+        title: "Главная",
         url: "/",
         exact: true,
       },

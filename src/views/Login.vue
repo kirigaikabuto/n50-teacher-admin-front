@@ -73,7 +73,8 @@ export default {
       this.loginAction({username: this.username, password: this.password});
       // eslint-disable-next-line no-empty
       console.log("error response", this.ErrorResponse)
-      if (this.ErrorResponse.length > 0) {
+      console.log(this.ErrorResponse.length)
+      if (this.ErrorResponse.length === 0) {
         this.$router.push({"name": "home"})
       }
     }
