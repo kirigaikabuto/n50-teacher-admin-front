@@ -51,6 +51,7 @@
                 >
                   <td><a class="waves-effect waves-orange pointer">{{ lesson.name }}</a></td>
                 </router-link>
+
                 <td>{{ lesson.description }}</td>
                 <td>{{ lesson.created_date }}</td>
               </tr>
