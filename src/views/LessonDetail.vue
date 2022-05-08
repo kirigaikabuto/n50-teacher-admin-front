@@ -33,7 +33,7 @@
               <span class="card-title">Описание</span>
               <span class="card-content">{{ this.lesson.description }}</span>
               <span class="card-title">Документ</span>
-              <span class="card-content"><a :href="this.lesson.document_file_url">Файл</a></span>
+              <span class="card-content"><a :href="this.lesson.document_file_url" >Файл</a></span>
             </div>
           </div>
 
