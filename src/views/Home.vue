@@ -45,7 +45,7 @@
               <tr v-for="lesson in lessons" v-bind:key="lesson.id">
                 <router-link
                     :key="lesson.id"
-                    :to="link"
+                    :to="{ name: 'lessonDetail', params: { id: lesson.id }}"
                     active-class="active"
 
                 >

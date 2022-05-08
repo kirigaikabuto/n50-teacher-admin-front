@@ -15,6 +15,7 @@ export default new Vuex.Store({
         groupSubject: [],
         group: {},
         lessons: {},
+        lesson: {},
     },
     mutations: {
         setLoginResponse: (state, resp) => {
@@ -37,6 +38,9 @@ export default new Vuex.Store({
         },
         setLessons: (state, resp) => {
             state.lessons = resp
+        },
+        setLesson: (state, resp) => {
+            state.lesson = resp
         }
     },
     actions: {
@@ -213,6 +217,28 @@ export default new Vuex.Store({
                     console.log("get lessons ", error.response.data.Message)
                     return error
                 });
+        },
+        getLessonById({commit}, data) {
+            console.log(data)
+            let temp = localStorage.getItem("userToken")
+            let accessToken = JSON.parse(temp).token
+            console.log(accessToken)
+            return axios.get(
+                host + "/lesson/id?id=" + data.id,
+                {
+                    headers: {
+                        "Authorization": "Bearer " + accessToken,
+                    }
+                }).then((resp) => {
+                console.log("get lesson", resp.data)
+                commit("setErrorResponse", "");
+                return resp.data
+            })
+                .catch((error) => {
+                    commit("setErrorResponse", error.response.data.Message);
+                    console.log("get lesson ", error.response.data.Message)
+                    return error
+                });
         }
     },
     getters: {
@@ -236,6 +262,9 @@ export default new Vuex.Store({
         },
         GetLessons(state) {
             return state.lessons
+        },
+        GetLesson(state) {
+            return state.lesson
         }
     },
     modules: {}

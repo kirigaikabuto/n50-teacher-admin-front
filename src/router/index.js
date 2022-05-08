@@ -51,6 +51,12 @@ const routes = [
         name: "record",
         meta: {layout: "main"},
         component: () => import("../views/Record")
+    },
+    {
+        path: "/lessonDetail/:id",
+        name: "lessonDetail",
+        meta: {layout: "main"},
+        component: () => import("../views/LessonDetail")
     }
 ]
 
