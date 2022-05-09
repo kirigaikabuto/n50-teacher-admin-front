@@ -1,81 +1,93 @@
 <template>
   <div>
     <div class="page-title">
-      <h3>Главная</h3>
-
-      <button class="btn waves-effect waves-light btn-small">
-        <i class="material-icons">refresh</i>
-      </button>
+      <h3>Создать Урок</h3>
     </div>
-    <div class="row">
 
-      <div class="col s12 m6 l4">
-        <div class="card light-blue bill-card">
-          <div class="card-content white-text">
-            <span class="card-title">Предметы</span>
-            <multiselect v-model="subjectValue" :options="options" @input="asyncFind">
+    <div class=" col s12 m6 l4">
+      <form class="form" v-on:submit="createLessonAction">
 
-            </multiselect>
+        <div class="input-field">
+          <span class="card-title">Предметы</span>
+          <multiselect v-model="subjectValue" :options="options" @input="asyncFind">
 
-            <multiselect v-model="groupValue" :options="groupNames" @input="groupSelectFind">
+          </multiselect>
+          <span class="card-title">Группа</span>
+          <multiselect v-model="groupValue" :options="groupNames" @input="groupSelectFind">
 
-            </multiselect>
-          </div>
-
+          </multiselect>
         </div>
 
-      </div>
-
-      <div class="col s12 m6 l8">
-        <div class="card orange darken-3 bill-card">
-          <div class="card-content white-text">
-            <div class="card-header">
-              <span class="card-title">Занятия</span>
-            </div>
-            <table>
-              <thead>
-              <tr>
-                <th>Название</th>
-                <th>Описание</th>
-                <th>Дата</th>
-              </tr>
-              </thead>
-
-              <tbody>
-              <tr v-for="lesson in lessons" v-bind:key="lesson.id">
-                <router-link
-                    :key="lesson.id"
-                    :to="{ name: 'lessonDetail', params: { id: lesson.id }}"
-                    active-class="active"
-
-                >
-                  <td><a class="waves-effect waves-orange pointer">{{ lesson.name }}</a></td>
-                </router-link>
-                <td>{{ lesson.description }}</td>
-                <td>{{ lesson.created_date }}</td>
-              </tr>
-              </tbody>
-            </table>
-          </div>
+        <div class="input-field">
+          <input
+              v-model="lessonNameVal"
+              id="name"
+              type="text"
+          >
+          <label for="name">Название</label>
         </div>
-      </div>
+
+        <div class="input-field">
+          <input
+              v-model="lessonDescVal"
+              id="description"
+              type="text"
+          >
+          <label for="description">Описание</label>
+        </div>
+
+        <button class="btn waves-effect waves-light" type="submit">
+          Создать
+          <i class="material-icons right">send</i>
+        </button>
+      </form  >
     </div>
+
+    <div class="col s12 m6 l8">
+      <form class="form" v-on:submit="uploadFormAction" >
+
+        <div class="input-field">
+          <span class="card-title">Предметы</span>
+          <multiselect v-model="subjectValue" :options="options" @input="asyncFind">
+
+          </multiselect>
+          <span class="card-title">Группа</span>
+          <multiselect v-model="groupValue" :options="groupNames" @input="groupSelectFind">
+
+          </multiselect>
+
+          <span class="card-title">Урок</span>
+          <multiselect
+              v-model="lessonValue"
+              :options="lessons"
+              label="name"
+              trackBy="name"
+              @input="lessonSelectFind"
+          >
+
+          </multiselect>
+        </div>
+
+        <label>File
+          <input type="file" id="file" ref="file" v-on:change="onChangeFileUpload()"/>
+        </label>
+        <button class="btn waves-effect waves-light" type="submit">
+          Загрузить
+          <i class="material-icons right">send</i>
+        </button>
+      </form>
+    </div>
+
   </div>
+
 </template>
 
-<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
-
-<style>
-
-</style>
-
 <script>
-// @ is an alias to /src
-import Multiselect from 'vue-multiselect'
-import {mapActions, mapGetters} from "vuex"
+import Multiselect from "vue-multiselect";
+import {mapActions, mapGetters} from "vuex";
 
 export default {
-  name: 'Home',
+  name: "CreateLesson",
   data() {
     return {
       link: "/planning",
@@ -88,6 +100,11 @@ export default {
       getTeacherSubjectResponse: null,
       globalCurrentTeacherSubjects: null,
       lessons: [],
+      currentGroupSubject: null,
+      lessonNameVal: "",
+      lessonDescVal: "",
+      lessonValue: null,
+      file: '',
     }
   },
   computed: {
@@ -107,8 +124,32 @@ export default {
       "getGroupById",
       "getGroupSubjectByTeacherSubGroupId",
       "getLessonsByGroupSubjectId",
+      "createLesson",
+      "uploadFileLesson",
 
     ]),
+    uploadFormAction() {
+      console.log("upload form lesson id", this.lessonValue.id)
+      console.log("upload from file", this.file)
+      this.uploadFileLesson({file: this.file, id: this.lessonValue.id}).then((resp) => {
+        console.log(resp)
+      })
+    },
+    lessonSelectFind() {
+      console.log("lesson select find", this.lessonValue)
+    },
+    createLessonAction(e) {
+      e.preventDefault()
+      let req = {
+        name: this.lessonNameVal,
+        description: this.lessonDescVal,
+        group_subject_id: this.currentGroupSubject.id,
+      }
+      console.log("create lesson action ", req)
+      this.createLesson(req).then((resp) => {
+        console.log(resp)
+      })
+    },
     groupSelectFind() {
       let currentGroup;
       console.log("group select find current", this.groupValue)
@@ -126,6 +167,7 @@ export default {
         groupId: currentGroup.id,
         teacherSubId: this.globalCurrentTeacherSubjects.id
       }).then((resp) => {
+        this.currentGroupSubject = resp
         console.log("group select find current group sub", resp)
         this.getLessonsByGroupSubjectId({id: resp.id}).then((myResp) => {
           for (let i of myResp.objects) {
@@ -134,6 +176,7 @@ export default {
         })
       })
       console.log("current lessons", this.lessons)
+      console.log("current group subject", this.currentGroupSubject)
     },
     asyncFind() {
       console.log("from async find", this.temp)
@@ -168,6 +211,10 @@ export default {
         console.log("currect group subjects", this.groups)
       })
     },
+    onChangeFileUpload() {
+      this.file = this.$refs.file.files[0];
+      console.log("on change file upload", this.file)
+    }
   },
   components: {
     Multiselect
@@ -195,4 +242,10 @@ export default {
     }
   }
 }
+
 </script>
+
+<style scoped>
+
+</style>
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>

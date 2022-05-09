@@ -239,6 +239,57 @@ export default new Vuex.Store({
                     console.log("get lesson ", error.response.data.Message)
                     return error
                 });
+        },
+        createLesson({commit}, data) {
+            let temp = localStorage.getItem("userToken")
+            let accessToken = JSON.parse(temp).token
+            const req = {
+                name: data.name,
+                description: data.description,
+                group_subject_id: data.group_subject_id,
+            };
+            return axios.post(
+                host + "/lesson",
+                req,
+                {
+                    headers: {
+                        "Authorization": "Bearer " + accessToken,
+                        "Access-Control-Allow-Methods": "*",
+                    }
+                }
+            )
+                .then((resp) => {
+                    commit("setErrorResponse", "");
+                    return resp.data
+                })
+                .catch((error) => {
+                    commit("setErrorResponse", error.response.data.Message);
+                    return error
+                })
+        },
+        uploadFileLesson({commit}, data) {
+            let temp = localStorage.getItem("userToken")
+            let accessToken = JSON.parse(temp).token
+            let req = new FormData()
+            req.append('file', data.file)
+            return axios.put(
+                host + "/lesson/file?id=" + data.id,
+                req,
+                {
+                    headers: {
+                        "Authorization": "Bearer " + accessToken,
+                        "Access-Control-Allow-Methods": "*",
+                    }
+                }
+            )
+                .then((resp) => {
+                    commit("setErrorResponse", "");
+                    return resp.data
+                })
+                .catch((error) => {
+                    commit("setErrorResponse", error.response.data.Message);
+                    return error
+                })
         }
     },
     getters: {

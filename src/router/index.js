@@ -57,6 +57,12 @@ const routes = [
         name: "lessonDetail",
         meta: {layout: "main"},
         component: () => import("../views/LessonDetail")
+    },
+    {
+        path:"/createLesson",
+        name:"createLesson",
+        meta: {layout: "main"},
+        component: ()=> import("../views/CreateLesson")
     }
 ]
 
